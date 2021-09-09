@@ -1,6 +1,4 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-import google_oauth
+import google.oauth2.credentials
 import google_auth_oauthlib.flow
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -8,11 +6,6 @@ import json
 import os
 
 
-
-
-
-def index(request):
-    return HttpResponse("Hello, World.")
 
 
 CLIENT_SECRET = 'I-lp8wYjtTCnnuLoGDpy58TR'
@@ -66,20 +59,10 @@ authorization_url, state = flow.authorization_url(
 def verify_id_token(credentials):
     idinfo = id_token.verify_oauth2_token(credentials.id_token, 
         requests.Request(),
-        json_data['web']['client_id']
+        secret_keys.google_client_id
     )
     return idinfo
 
 def verify_id_token_form_uri(uri):
     flow.fetch_token(authorization_response=uri)
     return verify_id_token(flow.credentials)
-
-def google_oauth_redirect(self, request):
-	if request.GET.get('code'):
-       		idinfo = google_oauth.verify_id_token_form_uri(
-              		uri = request.build_absolute_uri())
-           	# request.session['sub'] = idinfo['sub']
-           	# request.session['name'] = idinfo['name']
-           	return HttpResponse('로그인 완료 응답')
-	elif request.GET.get('error'):
-    		return HttpResponse('로그인 실패 응답')
